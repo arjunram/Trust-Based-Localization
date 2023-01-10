@@ -3,14 +3,14 @@ load Dataset1.mat;
 
 num_robots = 5;
 
-pos_est = zeros(num_robots,3);
+pos_est = zeros(4,num_robots);
 truthSize = zeros(num_robots,1);
 odomSize = zeros(num_robots,1);
 measSize = zeros(num_robots,1);
 % Set starting positions to be completely known
 for i = 1:num_robots
     temp_var = eval(strcat('robot',num2str(i),'_truth'));
-    pos_est(i,:) = temp_var(1,2:4);
+    pos_est(:,i) = temp_var(1,:)';
     truthSize(i) = size(temp_var,1);
     temp_var = eval(strcat('robot',num2str(i),'_odom'));
     odomSize(i) = size(temp_var,1);
@@ -55,4 +55,4 @@ for i = 1:num_robots
 end
 robot_odom = sortrows(robot_odom);
 
-save('Set1.mat','num_robots','truthSize','truths','meas','measSize','odoms','odomSize','landmarks','robot_meas','robot_odom');
+save('Set1.mat','num_robots','truthSize','truths','meas','measSize','odoms','odomSize','landmarks','robot_meas','robot_odom','pos_est');
