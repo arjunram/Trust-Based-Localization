@@ -47,29 +47,25 @@ function [pose,cov] = propagate(odom,dt,pose,cov)
     pose(3) = pose(3) + odom(2)*dt;
 end
 
-function [pose,cov] = update(meas,pose,targetPose,cov,targetCov, R)
+function [pose,cov] = update(meas,pose,targetPose,cov,targetCov, sigma_ij,sigma_ji,R)
 range = meas(1);
 bearing = meas(2);
 range_pred = sqrt((targetPose(1)-pose(1))^2 + (targetPose(2)-pose(2))^2);
 bearing_pred = atan2(targetPose(2)-pose(2),targetPose(1)-pose(1));
 innov = [range - range_pred; bearing - bearing_pred];
-H = GetObsJacs(targetPose);
-S = H*cov*H' + R;
+state = [pose;targetPose];
+stateCov = [cov sigma_ij; sigma_ji targetCov];
+H = GetObsJacs(pose,targetPose);
+S = H*stateCov*H' + R;
 K = cov*H'/S;
 pose = pose + K*innov;
 cov = (eye(3) - K*H)*cov*(eye(3)- K*H)' + K*R*K';
 end
 
-function [jHxv,jHxf] = GetObsJacs(xFeatureRoboCent)
-jHxv = zeros(2,3);jHxf = zeros(2,2);
-
-
-r = norm(xFeatureRoboCent);
-
-jHxf(1,:) = xFeatureRoboCent'/r;
-jHxf(2,:) = [-xFeatureRoboCent(2) xFeatureRoboCent(1)]/r^2;
-%jHxf = [xFeature(1)/r -xFeature(2)/r^2;
-%    xFeature(2)/r xFeature(1)/r^2];
-
-%  [-xFeature(2)/xFeature(1)^2 1/xFeature(1)] / (1+(xFeature(2)/xFeature(1))^2)
+function [jr,jtheta] = GetObsJacs(pose,targetpose)
+%jr = zeros(1,4);jtheta = zeros(1,4);
+dif = pose - targetpose;
+r = norm(dif);%range
+jr= [(dif)'/r (-dif)'/r];
+jtheta = [-dif(2) dif(1) dif(2) -dif(1)]/r^2;
 end
