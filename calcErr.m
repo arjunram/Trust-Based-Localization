@@ -1,5 +1,5 @@
 truthSaved = 1;
-id = 4;
+id = 1;
 idx = find(update_time(:,1));
 update_time1 = update_time(idx,:);
 idx = find(update_time1(:,2)==id);
@@ -25,9 +25,9 @@ else
     end
 end
 plot(err(1,:)-err(1,1),err(2,:));
-%hold on
-%scatter(update_time1(:,1) - update_time1(1,1),zeros(size(update_time1,1),1),5);
+hold on
+scatter(update_time1(:,1) - update_time1(1,1),zeros(size(update_time1,1),1),5);
 figure
 plot(err(1,:)-err(1,1),err(3,:));
-%hold on
-%scatter(update_time1(:,1) - update_time1(1,1),zeros(size(update_time1,1),1),5);
+hold on
+scatter(update_time1(:,1) - update_time1(1,1),zeros(size(update_time1,1),1),5);

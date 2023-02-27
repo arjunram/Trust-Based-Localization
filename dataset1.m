@@ -65,9 +65,9 @@ stateCov = cov;%[cov sigma_ij; sigma_ji targetCov];
 [jr, jtheta] = GetObsJacs(pose,targetPose);
 H = jr(1:2);%[jr(1:2);jtheta(1:2)];
 S = H*stateCov*H' + R;
-K = 0*stateCov*H'/S;
+K = stateCov*H'/S;
 state = state + K*innov;
-cov = stateCov;%(eye(1) - K*H)*stateCov*(eye(1)- K*H)' + K*R*K';
+cov = (eye(2) - K*H)*stateCov*(eye(2)- K*H)' + K*R*K';
 end
 
 function [jr,jtheta] = GetObsJacs(pose,targetpose)
