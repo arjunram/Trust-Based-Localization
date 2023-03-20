@@ -1,5 +1,6 @@
 clear
 load Set1.mat;
+% Only the measurement from the other robot is used. No trust, no cross covariance
 
 odomPointer = 1;
 measPointer = 1;
@@ -30,7 +31,7 @@ while(odomPointer<size(odom_xy,1) || measPointer<size(robot_meas,1))
         robotId = robot_meas(measPointer,2);
         measId = robot_meas(measPointer,3);
         if(measId<6)
-            [posState(:,robotId),posCov(:,:,robotId)] = update(robot_meas(measPointer,4:5),posState(:,robotId),posState(:,measId),posCov(:,:,robotId),posCov(:,:,measId),zeros(2),zeros(2),R);
+            [posState(:,robotId),posCov(:,:,robotId)] = update(robot_meas(measPointer,4:5),posState(:,robotId),posState(:,measId),posCov(:,:,robotId),posCov(:,:,measId),R);
             StateRec(1,end+1) = robot_meas(measPointer,1);
             StateRec(2:end,end) = reshape(posState,[],1);
             update_time(measPointer,:) = [robot_meas(measPointer,1) robotId];
@@ -54,7 +55,9 @@ function [pose,cov] = propagate(odom,dt,pose,cov,Q)
     cov = cov + Q*dt;
 end
 
-function [state,cov] = update(meas,pose,targetPose,cov,targetCov, sigma_ij,sigma_ji,R)
+
+
+function [state,cov] = update(meas,pose,targetPose,cov,targetCov,R)
 range = meas(1);
 %bearing = meas(2);
 range_pred = sqrt((targetPose(1)-pose(1))^2 + (targetPose(2)-pose(2))^2);
@@ -64,10 +67,10 @@ state = pose;%[pose;targetPose];
 stateCov = cov;%[cov sigma_ij; sigma_ji targetCov];
 [jr, jtheta] = GetObsJacs(pose,targetPose);
 H = jr(1:2);%[jr(1:2);jtheta(1:2)];
-S = H*stateCov*H' + R;
-K = 0stateCov*H'/S;
+S = H*stateCov*H' + R + norm(targetCov);
+K = stateCov*H'/S;
 state = state + K*innov;
-cov = (eye(1) - K*H)*stateCov*(eye(1)- K*H)' + K*R*K';
+cov = (eye(2) - K*H)*stateCov*(eye(2)- K*H)' + K*R*K';
 end
 
 function [jr,jtheta] = GetObsJacs(pose,targetpose)
