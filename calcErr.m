@@ -24,10 +24,15 @@ else
     end
     end
 end
-plot(err(1,:)-err(1,1),err(2,:));
+plot(err(1,:)-err(1,1),err(2,:),'r');
 hold on
-scatter(update_time1(:,1) - update_time1(1,1),zeros(size(update_time1,1),1),5);
+plot(err(1,:)-err(1,1),3*sqrt(CovRec(1,:)),'b');
+plot(err(1,:)-err(1,1),-3*sqrt(CovRec(1,:)),'b');
+
+%scatter(update_time1(:,1) - update_time1(1,1),zeros(size(update_time1,1),1),5);
 figure
-plot(err(1,:)-err(1,1),err(3,:));
+plot(err(1,:)-err(1,1),err(3,:),'r');
 hold on
-scatter(update_time1(:,1) - update_time1(1,1),zeros(size(update_time1,1),1),5);
+%scatter(update_time1(:,1) - update_time1(1,1),zeros(size(update_time1,1),1),5);
+plot(err(1,:)-err(1,1),3*sqrt(CovRec(4,:)),'b');
+plot(err(1,:)-err(1,1),-3*sqrt(CovRec(4,:)),'b');

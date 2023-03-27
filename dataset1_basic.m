@@ -13,7 +13,7 @@ CovRec(:,1) = posCov(:);
 %odomTime = zeros(num_robots,1);
 odomTime = pos_est(1,:)';
 Q = 0.001*eye(2);
-R = 10;%10*eye(2);
+R = 0.1;%10*eye(2);
 update_time(1,:) = [0 0];
 while(odomPointer<size(odom_xy,1) || measPointer<size(robot_meas,1))
 %while(odomPointer<10 || measPointer<10)    
