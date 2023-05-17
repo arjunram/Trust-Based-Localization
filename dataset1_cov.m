@@ -46,6 +46,8 @@ while(odomPointer<size(odom_xy,1) || measPointer<size(robot_meas,1))
     end
 end
 
+calcErr_cov
+
 function [pose,cov] = propagate(odom,dt,pose,cov,Q)
     if(dt<0) 
         return

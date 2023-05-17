@@ -64,6 +64,8 @@ while(odomPointer<size(odom_xy,1) || measPointer<size(robot_meas,1))
     end
 end
 
+calcErr
+
 function [pose,cov] = propagate(odom,dt,pose,cov,Q)
     if(dt<0) 
         return
@@ -89,7 +91,7 @@ range = robot_meas(1);
 range_pred = sqrt((targetPose(1)-pose(1))^2 + (targetPose(2)-pose(2))^2);
 innov = range - range_pred;
 trust = trust*exp(-lambda*dt) + W1*(1-trust)*scale_func(sf*norm(cov_old - cov,2) + W2*innov + W3*norm(cov,2));
-trust = 1;
+%trust = 1;
 end
 
 function scale = scale_func(val)
