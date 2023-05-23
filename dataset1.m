@@ -1,5 +1,7 @@
 clear
-load Set1.mat;
+%load Set1.mat;
+load Set1_10p_robot3.mat;
+plotid = 1;
 TrustInit = 0.8;
 odomPointer = 1;
 measPointer = 1;
@@ -9,6 +11,7 @@ StateRec = zeros(2*num_robots+1,1); % time in first index, followed by x and y o
 StateRec(1,1) = max(pos_est(1,:)); %last starting time of the initial robot positions
 StateRec(2:end,1) = reshape(posState,[],1);
 CovRec(:,1) = posCov(:);
+TrustRec(:,:,1) = TrustInit*ones(num_robots);
 %odomTime = zeros(num_robots,1);
 odomTime = pos_est(1,:)';
 measTime = zeros(5,5);
@@ -16,6 +19,8 @@ oldCov = zeros(5,5,3);
 Q = 0.001*eye(2);
 R = 0.1;%10*eye(2);
 update_time(1,:) = [0 0];
+trust = TrustInit*ones(num_robots);
+trustTime = 1;
 while(odomPointer<size(odom_xy,1) || measPointer<size(robot_meas,1))
 %while(odomPointer<10 || measPointer<10)    
     if(odom_xy(odomPointer,1)<=robot_meas(measPointer,1) || (measPointer==size(robot_meas,1) && odomPointer<size(odom_xy,1)))
@@ -57,7 +62,8 @@ while(odomPointer<size(odom_xy,1) || measPointer<size(robot_meas,1))
             StateRec(1,end+1) = robot_meas(measPointer,1);
             StateRec(2:end,end) = reshape(posState,[],1);
             update_time(measPointer,:) = [robot_meas(measPointer,1) robotId];
-            
+            trustTime(end+1) = robot_meas(measPointer,1);
+            TrustRec(:,:,end+1) = trust;
             CovRec(:,end+1) = posCov(:);
         end
         measPointer = measPointer + 1;
@@ -65,6 +71,9 @@ while(odomPointer<size(odom_xy,1) || measPointer<size(robot_meas,1))
 end
 
 calcErr
+figure;
+%plot(trustTime(2:end-1),squeeze(TrustRec(1,3,2:end-1)));
+plot(trustTime(2:end-1)-trustTime(2),squeeze(TrustRec(1,3,2:end-1)));
 
 function [pose,cov] = propagate(odom,dt,pose,cov,Q)
     if(dt<0) 
@@ -81,17 +90,21 @@ end
 
 function trust = trustCalc(trust,robot_meas,pose,targetPose,cov_old,cov,dt)
 %trustdot = -lambda*trust(i) + W1*(1-trust(i))*scale_func(sf*norm((Pt_old(:,:,i)-Pt_new),2) + W2*innov + W3*norm(Pt_new,2));
-lambda = 0.3;
-W1 = 1;
-W2 = 1.2;
-W3 = 0.1;
-sf = 1;
+lambda = 0.2;
+W1 = 0.5;
+W2 = 0.95;
+W3 = 0;
+sf = 0;
 
 range = robot_meas(1);
 range_pred = sqrt((targetPose(1)-pose(1))^2 + (targetPose(2)-pose(2))^2);
 innov = range - range_pred;
 trust = trust*exp(-lambda*dt) + W1*(1-trust)*scale_func(sf*norm(cov_old - cov,2) + W2*innov + W3*norm(cov,2));
+%trust = trust*exp(-lambda*dt) + W1*scale_func(sf*norm(cov_old - cov,2) + W2*innov + W3*norm(cov,2));
 %trust = 1;
+if (trust>1) 
+    trust = 1;
+end
 end
 
 function scale = scale_func(val)

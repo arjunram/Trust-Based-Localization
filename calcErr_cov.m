@@ -1,9 +1,9 @@
 truthSaved = 1;
-robot = 2;
+%plotid = 1;
 num_robots = 5;
 idx = find(update_time(:,1));
 update_time1 = update_time(idx,:);
-idx = find(update_time1(:,2)==robot);
+idx = find(update_time1(:,2)==plotid);
 update_time1 = update_time1(idx,:);
 if(truthSaved)
     %load PropTruthXY.mat
@@ -11,7 +11,7 @@ if(truthSaved)
     %for i = 1:size(StateRec,2)
     %    curTime = StateRec(1,i);
         %err(i,:) = [curTime, StateRec(2*id,i)-trueX(i), StateRec(2*id+1,i)-trueY(i)];
-        err = [StateRec(1,:); StateRec(2*robot,:)-trueX(:,robot)'; StateRec(2*robot+1,:)-trueY(:,robot)'];
+        err = [StateRec(1,:); StateRec(2*plotid,:)-trueX(:,plotid)'; StateRec(2*plotid+1,:)-trueY(:,plotid)'];
     %end
 else
     for id = 1:num_robots
@@ -27,13 +27,16 @@ else
 end
 plot(err(1,:)-err(1,1),err(2,:),'r');
 hold on
-plot(err(1,:)-err(1,1),3*sqrt(CovRec((robot-1)*(2*num_robots)^2+4*num_robots*(robot-1)+2*robot-1,:)),'b');
-plot(err(1,:)-err(1,1),-3*sqrt(CovRec((robot-1)*(2*num_robots)^2+4*num_robots*(robot-1)+2*robot-1,:)),'b');
-
+plot(err(1,:)-err(1,1),3*sqrt(CovRec((plotid-1)*(2*num_robots)^2+4*num_robots*(plotid-1)+2*plotid-1,:)),'b');
+plot(err(1,:)-err(1,1),-3*sqrt(CovRec((plotid-1)*(2*num_robots)^2+4*num_robots*(plotid-1)+2*plotid-1,:)),'b');
+xlabel('Time');
+ylabel('X');
 %scatter(update_time1(:,1) - update_time1(1,1),zeros(size(update_time1,1),1),5);
 figure
 plot(err(1,:)-err(1,1),err(3,:),'r');
 hold on
 %scatter(update_time1(:,1) - update_time1(1,1),zeros(size(update_time1,1),1),5);
-plot(err(1,:)-err(1,1),3*sqrt(CovRec((robot-1)*(2*num_robots)^2+4*num_robots*(robot-0.5)+2*robot,:)),'b');
-plot(err(1,:)-err(1,1),-3*sqrt(CovRec((robot-1)*(2*num_robots)^2+4*num_robots*(robot-0.5)+2*robot,:)),'b');
+plot(err(1,:)-err(1,1),3*sqrt(CovRec((plotid-1)*(2*num_robots)^2+4*num_robots*(plotid-0.5)+2*plotid,:)),'b');
+plot(err(1,:)-err(1,1),-3*sqrt(CovRec((plotid-1)*(2*num_robots)^2+4*num_robots*(plotid-0.5)+2*plotid,:)),'b');
+xlabel('Time');
+ylabel('Y');

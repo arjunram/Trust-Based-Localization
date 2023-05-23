@@ -1,5 +1,7 @@
 clear
-load Set1.mat;
+%load Set1.mat;
+load Set1_10p_robot3.mat;
+plotid = 1;
 TrustInit = 0.8;
 odomPointer = 1;
 measPointer = 1;
